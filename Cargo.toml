@@ -1,5 +1,5 @@
 [package]
-name = "git-branch-clean"
+name = "git-branch-clean-interactive"
 version = "0.1.0"
 edition = "2021"
 
