@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Build binary
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Upload binary (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: git-branch-clean-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/git-branch-clean
+
+      - name: Upload binary (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v2
+        with:
+          name: git-branch-clean-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/git-branch-clean.exe
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Prepare artifacts for release
+        run: |
+          mkdir -p release
+          cp artifacts/git-branch-clean-x86_64-unknown-linux-gnu/git-branch-clean release/git-branch-clean-linux-x86_64
+          cp artifacts/git-branch-clean-x86_64-apple-darwin/git-branch-clean release/git-branch-clean-macos-x86_64
+          cp artifacts/git-branch-clean-aarch64-apple-darwin/git-branch-clean release/git-branch-clean-macos-arm64
+          cp artifacts/git-branch-clean-x86_64-pc-windows-msvc/git-branch-clean.exe release/git-branch-clean-windows-x86_64.exe
+          cd release
+          chmod +x git-branch-clean-linux-x86_64 git-branch-clean-macos-x86_64 git-branch-clean-macos-arm64
+          tar -czf git-branch-clean-linux-x86_64.tar.gz git-branch-clean-linux-x86_64
+          tar -czf git-branch-clean-macos-x86_64.tar.gz git-branch-clean-macos-x86_64
+          tar -czf git-branch-clean-macos-arm64.tar.gz git-branch-clean-macos-arm64
+          zip git-branch-clean-windows-x86_64.zip git-branch-clean-windows-x86_64.exe
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release/git-branch-clean-linux-x86_64.tar.gz
+            release/git-branch-clean-macos-x86_64.tar.gz
+            release/git-branch-clean-macos-arm64.tar.gz
+            release/git-branch-clean-windows-x86_64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
