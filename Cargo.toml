@@ -3,5 +3,9 @@ name = "git-branch-clean-interactive"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "gbc"
+path = "src/main.rs"
+
 [dependencies]
 inquire = "0.7.5"

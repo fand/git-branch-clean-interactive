@@ -6,7 +6,11 @@ A CLI tool to remove git branches interactively.
 
 ## Install
 
-Get a prebuilt binary from the release page, or build yourself.
+```
+cargo install --git https://github.com/fand/git-branch-clean-interactive
+```
+
+Or get a prebuilt binary from the [release page](https://github.com/fand/git-branch-clean-interactive/releases).
 
 
 ## LICENSE

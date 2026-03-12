@@ -37,15 +37,15 @@ jobs:
         if: matrix.os != 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: git-branch-clean-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/git-branch-clean
+          name: gbc-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/gbc
 
       - name: Upload binary (Windows)
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: git-branch-clean-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/git-branch-clean.exe
+          name: gbc-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/gbc.exe
 
   release:
     name: Create Release
@@ -62,24 +62,24 @@ jobs:
       - name: Prepare artifacts for release
         run: |
           mkdir -p release
-          cp artifacts/git-branch-clean-x86_64-unknown-linux-gnu/git-branch-clean release/git-branch-clean-linux-x86_64
-          cp artifacts/git-branch-clean-x86_64-apple-darwin/git-branch-clean release/git-branch-clean-macos-x86_64
-          cp artifacts/git-branch-clean-aarch64-apple-darwin/git-branch-clean release/git-branch-clean-macos-arm64
-          cp artifacts/git-branch-clean-x86_64-pc-windows-msvc/git-branch-clean.exe release/git-branch-clean-windows-x86_64.exe
+          cp artifacts/gbc-x86_64-unknown-linux-gnu/gbc release/gbc-linux-x86_64
+          cp artifacts/gbc-x86_64-apple-darwin/gbc release/gbc-macos-x86_64
+          cp artifacts/gbc-aarch64-apple-darwin/gbc release/gbc-macos-arm64
+          cp artifacts/gbc-x86_64-pc-windows-msvc/gbc.exe release/gbc-windows-x86_64.exe
           cd release
-          chmod +x git-branch-clean-linux-x86_64 git-branch-clean-macos-x86_64 git-branch-clean-macos-arm64
-          tar -czf git-branch-clean-linux-x86_64.tar.gz git-branch-clean-linux-x86_64
-          tar -czf git-branch-clean-macos-x86_64.tar.gz git-branch-clean-macos-x86_64
-          tar -czf git-branch-clean-macos-arm64.tar.gz git-branch-clean-macos-arm64
-          zip git-branch-clean-windows-x86_64.zip git-branch-clean-windows-x86_64.exe
+          chmod +x gbc-linux-x86_64 gbc-macos-x86_64 gbc-macos-arm64
+          tar -czf gbc-linux-x86_64.tar.gz gbc-linux-x86_64
+          tar -czf gbc-macos-x86_64.tar.gz gbc-macos-x86_64
+          tar -czf gbc-macos-arm64.tar.gz gbc-macos-arm64
+          zip gbc-windows-x86_64.zip gbc-windows-x86_64.exe
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            release/git-branch-clean-linux-x86_64.tar.gz
-            release/git-branch-clean-macos-x86_64.tar.gz
-            release/git-branch-clean-macos-arm64.tar.gz
-            release/git-branch-clean-windows-x86_64.zip
+            release/gbc-linux-x86_64.tar.gz
+            release/gbc-macos-x86_64.tar.gz
+            release/gbc-macos-arm64.tar.gz
+            release/gbc-windows-x86_64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
